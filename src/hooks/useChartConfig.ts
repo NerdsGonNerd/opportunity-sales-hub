@@ -68,7 +68,7 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
         anchor: 'end',
         align: 'center',
         clamp: true,
-        offset: 10,
+        offset: -5,
         color: 'white',
         font: {
           weight: 'bold',
