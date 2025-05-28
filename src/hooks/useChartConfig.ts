@@ -6,7 +6,7 @@ interface UseChartConfigProps {
   stageCount: number;
 }
 
-export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps): ChartOptions<'bar'> => {
+export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) => {
   // Calculate dynamic bar thickness based on available space and number of stages
   const chartHeight = 320; // Height of the chart container
   const padding = 80; // Total padding (top + bottom)
@@ -17,7 +17,7 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps):
     Math.min(maxBarThickness, (chartHeight - padding) / stageCount * 0.7)
   );
 
-  return {
+  const chartConfig: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
     indexAxis: 'y' as const,
@@ -27,11 +27,6 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps):
         right: 80,
         left: 20,
         bottom: 20
-      }
-    },
-    elements: {
-      bar: {
-        barThickness: dynamicBarThickness
       }
     },
     scales: {
@@ -93,7 +88,8 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps):
         display: function(context) {
           // Only show labels for bars with values > 0
           const value = context.dataset.data[context.dataIndex];
-          return (value as any)?.x > 0 || value > 0;
+          const count = typeof value === 'object' && value !== null && 'x' in value ? value.x : typeof value === 'number' ? value : 0;
+          return count > 0;
         }
       }
     },
@@ -107,4 +103,6 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps):
       }
     }
   };
+
+  return { chartConfig, dynamicBarThickness };
 };

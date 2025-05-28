@@ -36,7 +36,7 @@ interface ChartJsBarChartProps {
 }
 
 export const ChartJsBarChart: React.FC<ChartJsBarChartProps> = ({ data, onBarClick }) => {
-  const chartConfig = useChartConfig({ onBarClick, stageCount: data.length });
+  const { chartConfig, dynamicBarThickness } = useChartConfig({ onBarClick, stageCount: data.length });
 
   // Sort data by stage ID in ascending order
   const sortedData = [...data].sort((a, b) => a.id - b.id);
@@ -54,7 +54,8 @@ export const ChartJsBarChart: React.FC<ChartJsBarChartProps> = ({ data, onBarCli
         borderColor: '#3b82f6',
         borderWidth: 0,
         categoryPercentage: 0.9,
-        barPercentage: 0.8
+        barPercentage: 0.8,
+        barThickness: dynamicBarThickness
       }
     ]
   };
