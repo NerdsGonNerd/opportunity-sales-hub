@@ -1,4 +1,5 @@
 
+
 import { ChartOptions } from 'chart.js';
 
 interface UseChartConfigProps {
@@ -51,7 +52,7 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
       tooltip: {
         callbacks: {
           title: function(context) {
-            return context[0].label;
+            return 'Opportunities';
           },
           label: function(context) {
             return `Opportunities: ${context.parsed.x}`;
@@ -68,7 +69,30 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
         anchor: 'end',
         align: 'start',
         clamp: true,
-        offset: 10,
+        offset: function(context) {
+          const value = context.dataset.data[context.dataIndex];
+          const numericValue = typeof value === 'object' && value !== null && 'x' in value 
+            ? (value as any).x 
+            : typeof value === 'number' 
+            ? value 
+            : 0;
+          
+          // Calculate text width based on font size and character count
+          const fontSize = Math.max(10, Math.min(14, dynamicBarThickness * 0.4));
+          const textLength = numericValue.toString().length;
+          const estimatedTextWidth = textLength * fontSize * 0.6; // Approximate character width
+          
+          // Calculate bar width from chart dimensions and value
+          const chart = context.chart;
+          const xScale = chart.scales.x;
+          const barWidth = xScale.getPixelForValue(numericValue) - xScale.getPixelForValue(0);
+          
+          // Ensure label stays within the bar with some padding
+          const padding = 8;
+          const maxOffset = Math.max(padding, barWidth - estimatedTextWidth - padding);
+          
+          return Math.min(10, maxOffset);
+        },
         color: 'white',
         font: {
           weight: 'bold',
@@ -108,3 +132,4 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
 
   return { chartConfig, dynamicBarThickness };
 };
+
