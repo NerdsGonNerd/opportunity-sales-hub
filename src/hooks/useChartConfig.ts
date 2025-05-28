@@ -31,16 +31,7 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
     },
     scales: {
       x: {
-        beginAtZero: true,
-        ticks: {
-          stepSize: 1,
-          callback: function(value) {
-            return Math.round(Number(value)).toString();
-          }
-        },
-        grid: {
-          display: true
-        }
+        display: false
       },
       y: {
         grid: {
