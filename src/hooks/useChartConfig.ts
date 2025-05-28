@@ -1,5 +1,3 @@
-
-
 import { ChartOptions } from 'chart.js';
 
 interface UseChartConfigProps {
@@ -52,7 +50,7 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
       tooltip: {
         callbacks: {
           title: function(context) {
-            return 'Opportunities';
+            return context[0].label;
           },
           label: function(context) {
             return `Opportunities: ${context.parsed.x}`;
@@ -132,4 +130,3 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
 
   return { chartConfig, dynamicBarThickness };
 };
-
