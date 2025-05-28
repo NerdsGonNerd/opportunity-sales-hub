@@ -33,7 +33,9 @@ export const MonthYearSelector: React.FC<MonthYearSelectorProps> = ({
   ];
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 10 }, (_, i) => currentYear + i);
+  const startYear = Math.min(currentYear - 5, year - 2); // Include past years and ensure current data year is included
+  const endYear = Math.max(currentYear + 10, year + 2); // Include future years and ensure current data year is included
+  const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i);
 
   return (
     <div className={`flex gap-1 ${className}`}>
