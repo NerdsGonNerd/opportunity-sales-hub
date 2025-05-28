@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +14,15 @@ import { OpportunityFilters } from '@/components/OpportunityFilters';
 import { OpportunityTable } from '@/components/OpportunityTable';
 import { ColumnCustomizer } from '@/components/ColumnCustomizer';
 import { BulkEditDialog } from '@/components/BulkEditDialog';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export interface Opportunity {
   id: number;
@@ -63,12 +71,14 @@ const Opportunities = () => {
   const [opportunities, setOpportunities] = useState<Opportunity[]>(mockOpportunities);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [editMode, setEditMode] = useState(false);
-  const [sortConfig, setSortConfig] = useState<{ field: string; direction: 'asc' | 'desc' } | null>(null);
+  const [sortConfig, setSortConfig] = useState<{ field: string; direction: 'asc' | 'desc' } | null>({ field: 'stage', direction: 'asc' });
   const [filters, setFilters] = useState<FilterConfig[]>([]);
   const [visibleColumns, setVisibleColumns] = useState<string[]>([
     'id', 'customerName', 'description', 'estimateRevenue', 'stage', 'type', 'isUrgent', 'estimateClose'
   ]);
   const [stageFilter, setStageFilter] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // Get primary product data for each opportunity
   const getProductData = (opportunity: Opportunity) => {
@@ -138,6 +148,19 @@ const Opportunities = () => {
     return filtered;
   }, [opportunities, filters, sortConfig, stageFilter]);
 
+  // Calculate pagination
+  const totalPages = pageSize === -1 ? 1 : Math.ceil(filteredOpportunities.length / pageSize);
+  const paginatedOpportunities = useMemo(() => {
+    if (pageSize === -1) return filteredOpportunities;
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredOpportunities.slice(startIndex, startIndex + pageSize);
+  }, [filteredOpportunities, currentPage, pageSize]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, stageFilter]);
+
   const getFieldValue = (opportunity: Opportunity, field: string) => {
     const productData = getProductData(opportunity);
     
@@ -201,10 +224,16 @@ const Opportunities = () => {
 
   const selectAll = () => {
     setSelectedIds(current => 
-      current.length === filteredOpportunities.length 
+      current.length === paginatedOpportunities.length 
         ? []
-        : filteredOpportunities.map(opp => opp.id)
+        : paginatedOpportunities.map(opp => opp.id)
     );
+  };
+
+  const handlePageSizeChange = (newPageSize: string) => {
+    const size = newPageSize === 'all' ? -1 : parseInt(newPageSize);
+    setPageSize(size);
+    setCurrentPage(1);
   };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -311,13 +340,26 @@ const Opportunities = () => {
               />
             )}
           </div>
+          <div className="flex items-center gap-2">
+            <Label>Page size:</Label>
+            <Select value={pageSize === -1 ? 'all' : pageSize.toString()} onValueChange={handlePageSizeChange}>
+              <SelectTrigger className="w-20">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Table */}
         <Card>
           <CardContent className="p-0">
             <OpportunityTable
-              opportunities={filteredOpportunities}
+              opportunities={paginatedOpportunities}
               visibleColumns={visibleColumns}
               selectedIds={selectedIds}
               editMode={editMode}
@@ -336,9 +378,55 @@ const Opportunities = () => {
           </CardContent>
         </Card>
 
+        {/* Pagination */}
+        {pageSize !== -1 && totalPages > 1 && (
+          <div className="flex justify-center">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(pageNum)}
+                        isActive={currentPage === pageNum}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+
         {/* Status Bar */}
         <div className="text-sm text-gray-500 text-center">
-          Showing {filteredOpportunities.length} of {opportunities.length} opportunities
+          Showing {pageSize === -1 ? filteredOpportunities.length : Math.min(pageSize, filteredOpportunities.length - (currentPage - 1) * pageSize)} of {filteredOpportunities.length} opportunities
           {selectedIds.length > 0 && ` • ${selectedIds.length} selected`}
         </div>
       </div>
