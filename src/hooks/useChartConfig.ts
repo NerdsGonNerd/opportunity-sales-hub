@@ -67,6 +67,7 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
       datalabels: {
         anchor: 'end',
         align: 'center',
+        clamp: true,
         color: 'white',
         font: {
           weight: 'bold',
