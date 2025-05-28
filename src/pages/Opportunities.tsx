@@ -79,6 +79,10 @@ const Opportunities = () => {
   const [stageFilter, setStageFilter] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [showClosedOpportunities, setShowClosedOpportunities] = useState(false);
+
+  // Terminal stage names (closed opportunities)
+  const terminalStages = ['Won', 'Lost', 'No Deal', 'No Lead'];
 
   // Define helper functions using useCallback to ensure stable references
   const getProductData = useCallback((opportunity: Opportunity) => {
@@ -120,12 +124,24 @@ const Opportunities = () => {
     }
   }, [getProductData]);
 
-  // Calculate stage counts for bar chart
+  // Filter opportunities by closed state first
+  const baseFilteredOpportunities = useMemo(() => {
+    if (showClosedOpportunities) {
+      return opportunities;
+    }
+    
+    return opportunities.filter(opp => {
+      const stage = mockStages.find(s => s.id === opp.stageId);
+      return stage && !terminalStages.includes(stage.name);
+    });
+  }, [opportunities, showClosedOpportunities, terminalStages]);
+
+  // Calculate stage counts for bar chart from base filtered opportunities
   const stageData = useMemo(() => {
-    console.log('Calculating stage data from opportunities:', opportunities.length);
+    console.log('Calculating stage data from opportunities:', baseFilteredOpportunities.length);
     
     const stageCounts = mockStages.map(stage => {
-      const count = opportunities.filter(opp => opp.stageId === stage.id).length;
+      const count = baseFilteredOpportunities.filter(opp => opp.stageId === stage.id).length;
       console.log(`Stage ${stage.name} (ID: ${stage.id}): ${count} opportunities`);
       return {
         id: stage.id,
@@ -134,16 +150,16 @@ const Opportunities = () => {
       };
     });
     
-    // Sort stages in reverse order (last stage first)
-    const sortedStages = stageCounts.reverse();
+    // Sort stages by ID in ascending order
+    const sortedStages = stageCounts.sort((a, b) => a.id - b.id);
     
-    console.log('Final stage data (reversed):', sortedStages);
+    console.log('Final stage data (sorted by ID):', sortedStages);
     return sortedStages;
-  }, [opportunities]);
+  }, [baseFilteredOpportunities]);
 
-  // Apply filters and sorting
+  // Apply filters and sorting to base filtered opportunities
   const filteredOpportunities = useMemo(() => {
-    let filtered = [...opportunities];
+    let filtered = [...baseFilteredOpportunities];
 
     // Apply stage filter from chart
     if (stageFilter) {
@@ -184,7 +200,7 @@ const Opportunities = () => {
     }
 
     return filtered;
-  }, [opportunities, filters, sortConfig, stageFilter, getFieldValue]);
+  }, [baseFilteredOpportunities, filters, sortConfig, stageFilter, getFieldValue]);
 
   // Calculate pagination
   const totalPages = pageSize === -1 ? 1 : Math.ceil(filteredOpportunities.length / pageSize);
@@ -197,7 +213,7 @@ const Opportunities = () => {
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [filters, stageFilter]);
+  }, [filters, stageFilter, showClosedOpportunities]);
 
   const handleSort = (field: string) => {
     setSortConfig(current => {
@@ -297,6 +313,8 @@ const Opportunities = () => {
         <OpportunityFilters 
           filters={filters}
           onUpdateFilters={setFilters}
+          showClosedOpportunities={showClosedOpportunities}
+          onToggleClosedOpportunities={setShowClosedOpportunities}
         />
 
         {/* Table Controls */}

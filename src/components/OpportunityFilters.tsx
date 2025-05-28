@@ -5,12 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Plus, Filter } from 'lucide-react';
 import { FilterConfig } from '@/pages/Opportunities';
 
 interface OpportunityFiltersProps {
   filters: FilterConfig[];
   onUpdateFilters: (filters: FilterConfig[]) => void;
+  showClosedOpportunities: boolean;
+  onToggleClosedOpportunities: (show: boolean) => void;
 }
 
 const availableFields = [
@@ -39,7 +43,9 @@ const operators = [
 
 export const OpportunityFilters: React.FC<OpportunityFiltersProps> = ({
   filters,
-  onUpdateFilters
+  onUpdateFilters,
+  showClosedOpportunities,
+  onToggleClosedOpportunities
 }) => {
   const [newFilter, setNewFilter] = useState<FilterConfig>({
     field: '',
@@ -71,6 +77,16 @@ export const OpportunityFilters: React.FC<OpportunityFiltersProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Show Closed Opportunities Toggle */}
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="show-closed"
+            checked={showClosedOpportunities}
+            onCheckedChange={onToggleClosedOpportunities}
+          />
+          <Label htmlFor="show-closed">Show closed opportunities</Label>
+        </div>
+
         {/* Active Filters */}
         {filters.length > 0 && (
           <div className="space-y-2">
