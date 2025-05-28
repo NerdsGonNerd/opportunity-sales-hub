@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -278,14 +279,14 @@ export const OpportunityTable: React.FC<OpportunityTableProps> = ({
             {visibleColumns.map(column => (
               <TableHead 
                 key={column}
-                className={columnDefinitions[column as keyof typeof columnDefinitions]?.sortable ? 'cursor-pointer select-none' : ''}
+                className={`${columnDefinitions[column as keyof typeof columnDefinitions]?.sortable ? 'cursor-pointer select-none' : ''} ${column === 'estimateRevenue' ? 'text-right' : ''}`}
                 onClick={() => {
                   if (columnDefinitions[column as keyof typeof columnDefinitions]?.sortable) {
                     onSort(column);
                   }
                 }}
               >
-                <div className="flex items-center space-x-1">
+                <div className={`flex items-center space-x-1 ${column === 'estimateRevenue' ? 'justify-end' : ''}`}>
                   <span>{columnDefinitions[column as keyof typeof columnDefinitions]?.label || column}</span>
                   {getSortIcon(column)}
                 </div>
@@ -306,7 +307,7 @@ export const OpportunityTable: React.FC<OpportunityTableProps> = ({
                 />
               </TableCell>
               {visibleColumns.map(column => (
-                <TableCell key={column} className="min-w-0">
+                <TableCell key={column} className={`min-w-0 ${column === 'estimateRevenue' ? 'text-right' : ''}`}>
                   {renderCell(opportunity, column)}
                 </TableCell>
               ))}
