@@ -3,9 +3,20 @@ import { ChartOptions } from 'chart.js';
 
 interface UseChartConfigProps {
   onBarClick?: (stageId: number) => void;
+  stageCount: number;
 }
 
-export const useChartConfig = ({ onBarClick }: UseChartConfigProps): ChartOptions<'bar'> => {
+export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps): ChartOptions<'bar'> => {
+  // Calculate dynamic bar thickness based on available space and number of stages
+  const chartHeight = 320; // Height of the chart container
+  const padding = 80; // Total padding (top + bottom)
+  const maxBarThickness = 40;
+  const minBarThickness = 15;
+  const dynamicBarThickness = Math.max(
+    minBarThickness, 
+    Math.min(maxBarThickness, (chartHeight - padding) / stageCount * 0.7)
+  );
+
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -16,6 +27,11 @@ export const useChartConfig = ({ onBarClick }: UseChartConfigProps): ChartOption
         right: 80,
         left: 20,
         bottom: 20
+      }
+    },
+    elements: {
+      bar: {
+        barThickness: dynamicBarThickness
       }
     },
     scales: {
@@ -63,15 +79,21 @@ export const useChartConfig = ({ onBarClick }: UseChartConfigProps): ChartOption
         displayColors: false
       },
       datalabels: {
-        anchor: 'end',
-        align: 'end',
+        anchor: 'center',
+        align: 'center',
         color: 'white',
         font: {
           weight: 'bold',
-          size: 12
+          size: Math.max(10, Math.min(14, dynamicBarThickness * 0.4))
         },
         formatter: (value: any) => {
-          return value.x || value;
+          const count = value.x || value;
+          return count > 0 ? count.toString() : '';
+        },
+        display: function(context) {
+          // Only show labels for bars with values > 0
+          const value = context.dataset.data[context.dataIndex];
+          return (value as any)?.x > 0 || value > 0;
         }
       }
     },
