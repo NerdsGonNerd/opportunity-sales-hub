@@ -8,7 +8,9 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartOptions,
 } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Bar } from 'react-chartjs-2';
 import { useChartConfig } from '@/hooks/useChartConfig';
 
@@ -18,7 +20,8 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartDataLabels
 );
 
 interface ChartData {
@@ -35,11 +38,14 @@ interface ChartJsBarChartProps {
 export const ChartJsBarChart: React.FC<ChartJsBarChartProps> = ({ data, onBarClick }) => {
   const chartConfig = useChartConfig({ onBarClick });
 
+  // Sort data in ascending order by count (opposite of previous descending order)
+  const sortedData = [...data].sort((a, b) => a.count - b.count);
+
   const chartData = {
-    labels: data.map(item => item.name),
+    labels: sortedData.map(item => item.name),
     datasets: [
       {
-        data: data.map(item => ({
+        data: sortedData.map(item => ({
           x: item.count,
           y: item.name,
           stageId: item.id
