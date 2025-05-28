@@ -135,9 +135,11 @@ const Opportunities = () => {
       };
     });
     
-    // Include all stages, even with 0 count, for better visualization
-    console.log('Final stage data:', stageCounts);
-    return stageCounts;
+    // Sort stages in reverse order (last stage first)
+    const sortedStages = stageCounts.reverse();
+    
+    console.log('Final stage data (reversed):', sortedStages);
+    return sortedStages;
   }, [opportunities]);
 
   // Apply filters and sorting
