@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, LabelList } from 'recharts';
 import { ChevronDown, ChevronUp, Edit, Filter, Plus } from 'lucide-react';
 import { mockOpportunities, mockStages, mockSources, mockTypes, mockProbabilities } from '@/data/mockData';
 import { OpportunityFilters } from '@/components/OpportunityFilters';
@@ -90,7 +90,7 @@ const Opportunities = () => {
       name: stage.name,
       count: opportunities.filter(opp => opp.stageId === stage.id).length
     }));
-    return stageCounts;
+    return stageCounts.filter(stage => stage.count > 0); // Only show stages with data
   }, [opportunities]);
 
   // Apply filters and sorting
@@ -218,15 +218,6 @@ const Opportunities = () => {
     return null;
   };
 
-  const CustomizedLabel = (props: any) => {
-    const { x, y, width, height, value } = props;
-    return (
-      <text x={x + width + 5} y={y + height / 2} dy={4} fontSize={12} fill="#666">
-        {value}
-      </text>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -241,27 +232,38 @@ const Opportunities = () => {
             <CardTitle>Opportunities by Stage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64">
+            <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
                   data={stageData} 
                   layout="horizontal"
-                  margin={{ top: 5, right: 30, left: 5, bottom: 5 }}
+                  margin={{ top: 5, right: 60, left: 100, bottom: 5 }}
                 >
                   <XAxis 
                     type="number" 
                     domain={[0, 'dataMax']}
                     tickFormatter={(value) => Math.round(value).toString()}
+                    allowDecimals={false}
                   />
-                  <YAxis type="category" dataKey="name" width={80} />
+                  <YAxis 
+                    type="category" 
+                    dataKey="name" 
+                    width={90}
+                    tick={{ fontSize: 12 }}
+                  />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar 
                     dataKey="count" 
                     fill="#3b82f6"
                     className="cursor-pointer"
                     onClick={(data) => handleStageClick(data.id)}
-                    label={<CustomizedLabel />}
-                  />
+                  >
+                    <LabelList 
+                      dataKey="count" 
+                      position="right" 
+                      style={{ fontSize: '12px', fill: '#666' }}
+                    />
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>

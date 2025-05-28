@@ -23,7 +23,11 @@ const editableFields = [
   ]},
   { value: 'estimateRevenue', label: 'Revenue', type: 'number' },
   { value: 'customerState', label: 'State', type: 'text' },
-  { value: 'divisionId', label: 'Division', type: 'text' }
+  { value: 'divisionId', label: 'Division', type: 'text' },
+  { value: 'estimateCloseMonth', label: 'Close Month', type: 'number' },
+  { value: 'estimateCloseYear', label: 'Close Year', type: 'number' },
+  { value: 'estimateDeliveryMonth', label: 'Delivery Month', type: 'number' },
+  { value: 'estimateDeliveryYear', label: 'Delivery Year', type: 'number' }
 ];
 
 export const BulkEditDialog: React.FC<BulkEditDialogProps> = ({
@@ -74,6 +78,19 @@ export const BulkEditDialog: React.FC<BulkEditDialogProps> = ({
             ))}
           </SelectContent>
         </Select>
+      );
+    }
+
+    if (selectedFieldConfig.type === 'number') {
+      return (
+        <Input
+          type="number"
+          value={selectedValue}
+          onChange={(e) => setSelectedValue(e.target.value)}
+          placeholder={selectedFieldConfig.value.includes('Month') ? "Enter month (1-12)" : "Enter value"}
+          min={selectedFieldConfig.value.includes('Month') ? 1 : undefined}
+          max={selectedFieldConfig.value.includes('Month') ? 12 : undefined}
+        />
       );
     }
 
