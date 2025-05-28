@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -80,8 +81,8 @@ const Opportunities = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // Get primary product data for each opportunity
-  const getProductData = (opportunity: Opportunity) => {
+  // Define helper functions using useCallback to ensure stable references
+  const getProductData = useCallback((opportunity: Opportunity) => {
     const primaryProduct = opportunity.productGroups
       .flatMap(group => group.products)
       .find(product => product.isPrimary);
@@ -91,7 +92,34 @@ const Opportunities = () => {
       baseModel: primaryProduct?.baseModelId || '',
       model: primaryProduct?.description || ''
     };
-  };
+  }, []);
+
+  const getFieldValue = useCallback((opportunity: Opportunity, field: string) => {
+    const productData = getProductData(opportunity);
+    
+    switch (field) {
+      case 'stage':
+        return mockStages.find(s => s.id === opportunity.stageId)?.name || '';
+      case 'type':
+        return mockTypes.find(t => t.id === opportunity.typeId)?.name || '';
+      case 'probability':
+        return mockProbabilities.find(p => p.id === opportunity.probabilityOfClosingId)?.name || '';
+      case 'source':
+        return mockSources.find(s => s.id === opportunity.sourceId)?.name || '';
+      case 'serialNumber':
+        return productData.serialNumber;
+      case 'baseModel':
+        return productData.baseModel;
+      case 'model':
+        return productData.model;
+      case 'estimateDelivery':
+        return `${opportunity.estimateDeliveryMonth}/${opportunity.estimateDeliveryYear}`;
+      case 'estimateClose':
+        return `${opportunity.estimateCloseMonth}/${opportunity.estimateCloseYear}`;
+      default:
+        return opportunity[field as keyof Opportunity] || '';
+    }
+  }, [getProductData]);
 
   // Calculate stage counts for bar chart
   const stageData = useMemo(() => {
@@ -146,7 +174,7 @@ const Opportunities = () => {
     }
 
     return filtered;
-  }, [opportunities, filters, sortConfig, stageFilter]);
+  }, [opportunities, filters, sortConfig, stageFilter, getFieldValue]);
 
   // Calculate pagination
   const totalPages = pageSize === -1 ? 1 : Math.ceil(filteredOpportunities.length / pageSize);
@@ -160,33 +188,6 @@ const Opportunities = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [filters, stageFilter]);
-
-  const getFieldValue = (opportunity: Opportunity, field: string) => {
-    const productData = getProductData(opportunity);
-    
-    switch (field) {
-      case 'stage':
-        return mockStages.find(s => s.id === opportunity.stageId)?.name || '';
-      case 'type':
-        return mockTypes.find(t => t.id === opportunity.typeId)?.name || '';
-      case 'probability':
-        return mockProbabilities.find(p => p.id === opportunity.probabilityOfClosingId)?.name || '';
-      case 'source':
-        return mockSources.find(s => s.id === opportunity.sourceId)?.name || '';
-      case 'serialNumber':
-        return productData.serialNumber;
-      case 'baseModel':
-        return productData.baseModel;
-      case 'model':
-        return productData.model;
-      case 'estimateDelivery':
-        return `${opportunity.estimateDeliveryMonth}/${opportunity.estimateDeliveryYear}`;
-      case 'estimateClose':
-        return `${opportunity.estimateCloseMonth}/${opportunity.estimateCloseYear}`;
-      default:
-        return opportunity[field as keyof Opportunity] || '';
-    }
-  };
 
   const handleSort = (field: string) => {
     setSortConfig(current => {
