@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,13 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, LabelList } from 'recharts';
 import { ChevronDown, ChevronUp, Edit, Filter, Plus } from 'lucide-react';
 import { mockOpportunities, mockStages, mockSources, mockTypes, mockProbabilities } from '@/data/mockData';
 import { OpportunityFilters } from '@/components/OpportunityFilters';
 import { OpportunityTable } from '@/components/OpportunityTable';
 import { ColumnCustomizer } from '@/components/ColumnCustomizer';
 import { BulkEditDialog } from '@/components/BulkEditDialog';
+import { ChartJsBarChart } from '@/components/ChartJsBarChart';
 import {
   Pagination,
   PaginationContent,
@@ -211,10 +210,8 @@ const Opportunities = () => {
     });
   };
 
-  const handleStageClick = (data: any) => {
-    if (data && data.id) {
-      setStageFilter(current => current === data.id ? null : data.id);
-    }
+  const handleStageClick = (stageId: number) => {
+    setStageFilter(current => current === stageId ? null : stageId);
   };
 
   const handleBulkEdit = (field: string, value: string) => {
@@ -275,46 +272,10 @@ const Opportunities = () => {
             <CardTitle>Opportunities by Stage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={stageData} 
-                  layout="horizontal"
-                  margin={{ top: 20, right: 80, left: 120, bottom: 20 }}
-                >
-                  <XAxis 
-                    type="number" 
-                    domain={[0, 'dataMax + 1']}
-                    tickFormatter={(value) => Math.round(value).toString()}
-                    allowDecimals={false}
-                  />
-                  <YAxis 
-                    type="category" 
-                    dataKey="name" 
-                    width={110}
-                    tick={{ fontSize: 12 }}
-                    interval={0}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar 
-                    dataKey="count" 
-                    fill="#3b82f6"
-                    minPointSize={2}
-                    onClick={handleStageClick}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {stageData.map((entry, index) => (
-                      <Cell key={`cell-${entry.id}-${index}`} fill="#3b82f6" />
-                    ))}
-                    <LabelList 
-                      dataKey="count" 
-                      position="right" 
-                      style={{ fontSize: '12px', fill: '#666' }}
-                    />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <ChartJsBarChart 
+              data={stageData}
+              onBarClick={handleStageClick}
+            />
             {stageFilter && (
               <div className="mt-4">
                 <Badge variant="secondary" className="mr-2">
