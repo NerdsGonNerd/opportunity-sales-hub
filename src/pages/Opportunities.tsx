@@ -123,12 +123,21 @@ const Opportunities = () => {
 
   // Calculate stage counts for bar chart
   const stageData = useMemo(() => {
-    const stageCounts = mockStages.map(stage => ({
-      id: stage.id,
-      name: stage.name,
-      count: opportunities.filter(opp => opp.stageId === stage.id).length
-    }));
-    return stageCounts.filter(stage => stage.count > 0); // Only show stages with data
+    console.log('Calculating stage data from opportunities:', opportunities.length);
+    
+    const stageCounts = mockStages.map(stage => {
+      const count = opportunities.filter(opp => opp.stageId === stage.id).length;
+      console.log(`Stage ${stage.name} (ID: ${stage.id}): ${count} opportunities`);
+      return {
+        id: stage.id,
+        name: stage.name,
+        count: count
+      };
+    });
+    
+    // Include all stages, even with 0 count, for better visualization
+    console.log('Final stage data:', stageCounts);
+    return stageCounts;
   }, [opportunities]);
 
   // Apply filters and sorting
@@ -200,8 +209,10 @@ const Opportunities = () => {
     });
   };
 
-  const handleStageClick = (stageId: number) => {
-    setStageFilter(current => current === stageId ? null : stageId);
+  const handleStageClick = (data: any) => {
+    if (data && data.id) {
+      setStageFilter(current => current === data.id ? null : data.id);
+    }
   };
 
   const handleBulkEdit = (field: string, value: string) => {
@@ -267,27 +278,32 @@ const Opportunities = () => {
                 <BarChart 
                   data={stageData} 
                   layout="horizontal"
-                  margin={{ top: 5, right: 60, left: 100, bottom: 5 }}
+                  margin={{ top: 20, right: 80, left: 120, bottom: 20 }}
                 >
                   <XAxis 
                     type="number" 
-                    domain={[0, 'dataMax']}
+                    domain={[0, 'dataMax + 1']}
                     tickFormatter={(value) => Math.round(value).toString()}
                     allowDecimals={false}
                   />
                   <YAxis 
                     type="category" 
                     dataKey="name" 
-                    width={90}
+                    width={110}
                     tick={{ fontSize: 12 }}
+                    interval={0}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar 
                     dataKey="count" 
                     fill="#3b82f6"
-                    className="cursor-pointer"
-                    onClick={(data) => handleStageClick(data.id)}
+                    minPointSize={2}
+                    onClick={handleStageClick}
+                    style={{ cursor: 'pointer' }}
                   >
+                    {stageData.map((entry, index) => (
+                      <Cell key={`cell-${entry.id}-${index}`} fill="#3b82f6" />
+                    ))}
                     <LabelList 
                       dataKey="count" 
                       position="right" 
