@@ -254,7 +254,7 @@ const Opportunities = () => {
         {/* Stage Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Opportunities by Stage</CardTitle>
+            <CardTitle>Pipeline</CardTitle>
           </CardHeader>
           <CardContent>
             <ChartJsBarChart data={stageData} onBarClick={handleStageClick} />
