@@ -1,3 +1,4 @@
+
 import { ChartOptions } from 'chart.js';
 
 interface UseChartConfigProps {
@@ -67,7 +68,7 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
         anchor: 'end',
         align: 'start',
         clamp: true,
-        offset: -10,
+        offset: 10,
         color: 'white',
         font: {
           weight: 'bold',
