@@ -48,7 +48,23 @@ export const BulkEditDialog: React.FC<BulkEditDialogProps> = ({
       return;
     }
 
-    onBulkEdit(selectedField, selectedValue);
+    // Process the value based on field type
+    let processedValue = selectedValue;
+    
+    // Convert to appropriate types for numeric fields
+    if (['stageId', 'typeId', 'probabilityOfClosingId', 'estimateCloseMonth', 'estimateCloseYear', 'estimateDeliveryMonth', 'estimateDeliveryYear'].includes(selectedField)) {
+      processedValue = parseInt(selectedValue).toString();
+    } else if (selectedField === 'estimateRevenue') {
+      processedValue = parseFloat(selectedValue).toString();
+    } else if (selectedField === 'isUrgent') {
+      processedValue = selectedValue === 'true' ? 'true' : 'false';
+    }
+
+    console.log('Bulk editing field:', selectedField, 'with value:', processedValue);
+    
+    onBulkEdit(selectedField, processedValue);
+    
+    // Close dialog and reset form
     setIsOpen(false);
     setSelectedField('');
     setSelectedValue('');

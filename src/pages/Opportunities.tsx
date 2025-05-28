@@ -215,10 +215,37 @@ const Opportunities = () => {
     setStageFilter(current => current === stageId ? null : stageId);
   };
   const handleBulkEdit = (field: string, value: string) => {
-    setOpportunities(current => current.map(opp => selectedIds.includes(opp.id) ? {
-      ...opp,
-      [field]: value
-    } : opp));
+    console.log('Processing bulk edit:', field, value, 'for IDs:', selectedIds);
+    
+    setOpportunities(current => {
+      const updated = current.map(opp => {
+        if (selectedIds.includes(opp.id)) {
+          let updateValue: any = value;
+          
+          // Convert value to appropriate type based on field
+          if (['stageId', 'typeId', 'probabilityOfClosingId', 'estimateCloseMonth', 'estimateCloseYear', 'estimateDeliveryMonth', 'estimateDeliveryYear'].includes(field)) {
+            updateValue = parseInt(value);
+          } else if (field === 'estimateRevenue') {
+            updateValue = parseFloat(value);
+          } else if (field === 'isUrgent') {
+            updateValue = value === 'true';
+          }
+          
+          console.log(`Updating opportunity ${opp.id}: ${field} = ${updateValue}`);
+          
+          return {
+            ...opp,
+            [field]: updateValue
+          };
+        }
+        return opp;
+      });
+      
+      console.log('Updated opportunities:', updated.filter(opp => selectedIds.includes(opp.id)));
+      return updated;
+    });
+    
+    // Clear selections after bulk edit
     setSelectedIds([]);
   };
   const toggleSelection = (id: number) => {
