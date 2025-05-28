@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
 import { ChevronDown, ChevronUp, Edit, Filter, Plus } from 'lucide-react';
 import { mockOpportunities, mockStages, mockSources, mockTypes, mockProbabilities } from '@/data/mockData';
 import { OpportunityFilters } from '@/components/OpportunityFilters';
@@ -32,6 +32,8 @@ export interface Opportunity {
   isUrgent: boolean;
   estimateDeliveryMonth: number;
   estimateDeliveryYear: number;
+  estimateCloseMonth: number;
+  estimateCloseYear: number;
   enterDate: string;
   changeDate: string;
   divisionId: string;
@@ -64,7 +66,7 @@ const Opportunities = () => {
   const [sortConfig, setSortConfig] = useState<{ field: string; direction: 'asc' | 'desc' } | null>(null);
   const [filters, setFilters] = useState<FilterConfig[]>([]);
   const [visibleColumns, setVisibleColumns] = useState<string[]>([
-    'id', 'customerName', 'description', 'estimateRevenue', 'stage', 'type', 'isUrgent', 'estimateDelivery'
+    'id', 'customerName', 'description', 'estimateRevenue', 'stage', 'type', 'isUrgent', 'estimateClose'
   ]);
   const [stageFilter, setStageFilter] = useState<number | null>(null);
 
@@ -156,6 +158,8 @@ const Opportunities = () => {
         return productData.model;
       case 'estimateDelivery':
         return `${opportunity.estimateDeliveryMonth}/${opportunity.estimateDeliveryYear}`;
+      case 'estimateClose':
+        return `${opportunity.estimateCloseMonth}/${opportunity.estimateCloseYear}`;
       default:
         return opportunity[field as keyof Opportunity] || '';
     }
@@ -203,31 +207,32 @@ const Opportunities = () => {
     );
   };
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-2 border border-gray-300 rounded shadow">
+          <p className="text-sm font-medium">{`${label}: ${payload[0].value}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const CustomizedLabel = (props: any) => {
+    const { x, y, width, height, value } = props;
+    return (
+      <text x={x + width + 5} y={y + height / 2} dy={4} fontSize={12} fill="#666">
+        {value}
+      </text>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Sales Opportunities</h1>
-          <div className="flex gap-2">
-            <ColumnCustomizer 
-              visibleColumns={visibleColumns}
-              onUpdateColumns={setVisibleColumns}
-            />
-            <Button
-              variant={editMode ? "default" : "outline"}
-              onClick={() => setEditMode(!editMode)}
-            >
-              <Edit className="w-4 h-4 mr-2" />
-              {editMode ? 'Exit Edit Mode' : 'Edit Mode'}
-            </Button>
-            {selectedIds.length > 0 && (
-              <BulkEditDialog
-                selectedCount={selectedIds.length}
-                onBulkEdit={handleBulkEdit}
-              />
-            )}
-          </div>
         </div>
 
         {/* Stage Chart */}
@@ -236,17 +241,26 @@ const Opportunities = () => {
             <CardTitle>Opportunities by Stage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-48">
+            <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stageData}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
+                <BarChart 
+                  data={stageData} 
+                  layout="horizontal"
+                  margin={{ top: 5, right: 30, left: 5, bottom: 5 }}
+                >
+                  <XAxis 
+                    type="number" 
+                    domain={[0, 'dataMax']}
+                    tickFormatter={(value) => Math.round(value).toString()}
+                  />
+                  <YAxis type="category" dataKey="name" width={80} />
+                  <Tooltip content={<CustomTooltip />} />
                   <Bar 
                     dataKey="count" 
                     fill="#3b82f6"
                     className="cursor-pointer"
                     onClick={(data) => handleStageClick(data.id)}
+                    label={<CustomizedLabel />}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -273,6 +287,29 @@ const Opportunities = () => {
           filters={filters}
           onUpdateFilters={setFilters}
         />
+
+        {/* Table Controls */}
+        <div className="flex justify-between items-center">
+          <div className="flex gap-2">
+            <ColumnCustomizer 
+              visibleColumns={visibleColumns}
+              onUpdateColumns={setVisibleColumns}
+            />
+            <Button
+              variant={editMode ? "default" : "outline"}
+              onClick={() => setEditMode(!editMode)}
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              {editMode ? 'Exit Edit Mode' : 'Edit Mode'}
+            </Button>
+            {selectedIds.length > 0 && (
+              <BulkEditDialog
+                selectedCount={selectedIds.length}
+                onBulkEdit={handleBulkEdit}
+              />
+            )}
+          </div>
+        </div>
 
         {/* Table */}
         <Card>

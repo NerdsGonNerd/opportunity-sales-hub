@@ -33,6 +33,7 @@ const columnDefinitions = {
   probability: { label: 'Probability', sortable: true },
   source: { label: 'Source', sortable: true },
   isUrgent: { label: 'Urgent', sortable: true },
+  estimateClose: { label: 'Est. Close', sortable: true },
   estimateDelivery: { label: 'Est. Delivery', sortable: true },
   serialNumber: { label: 'Serial #', sortable: true },
   baseModel: { label: 'Base Model', sortable: true },
@@ -84,6 +85,8 @@ export const OpportunityTable: React.FC<OpportunityTableProps> = ({
         return productData.model;
       case 'estimateDelivery':
         return `${opportunity.estimateDeliveryMonth}/${opportunity.estimateDeliveryYear}`;
+      case 'estimateClose':
+        return `${opportunity.estimateCloseMonth}/${opportunity.estimateCloseYear}`;
       case 'estimateRevenue':
         return opportunity.estimateRevenue ? `$${opportunity.estimateRevenue.toLocaleString()}` : '';
       case 'isUrgent':

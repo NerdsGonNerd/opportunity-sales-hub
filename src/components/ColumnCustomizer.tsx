@@ -22,6 +22,7 @@ const allColumns = [
   { id: 'probability', label: 'Probability' },
   { id: 'source', label: 'Source' },
   { id: 'isUrgent', label: 'Urgent' },
+  { id: 'estimateClose', label: 'Est. Close' },
   { id: 'estimateDelivery', label: 'Est. Delivery' },
   { id: 'serialNumber', label: 'Serial Number' },
   { id: 'baseModel', label: 'Base Model' },
@@ -55,7 +56,7 @@ export const ColumnCustomizer: React.FC<ColumnCustomizerProps> = ({
   };
 
   const resetToDefault = () => {
-    const defaultColumns = ['id', 'customerName', 'description', 'estimateRevenue', 'stage', 'type', 'isUrgent', 'estimateDelivery'];
+    const defaultColumns = ['id', 'customerName', 'description', 'estimateRevenue', 'stage', 'type', 'isUrgent', 'estimateClose'];
     setTempColumns(defaultColumns);
   };
 
