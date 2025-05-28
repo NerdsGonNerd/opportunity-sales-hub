@@ -63,17 +63,16 @@ export const useChartConfig = ({ onBarClick }: UseChartConfigProps): ChartOption
         displayColors: false
       },
       datalabels: {
-        anchor: 'end',
-        align: 'right',
-        color: '#374151',
+        anchor: 'center',
+        align: 'center',
+        color: 'white',
         font: {
           weight: 'bold',
           size: 12
         },
         formatter: (value: any) => {
           return value.x;
-        },
-        offset: 4
+        }
       }
     },
     onClick: (event, elements, chart) => {

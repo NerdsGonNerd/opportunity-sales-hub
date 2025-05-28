@@ -38,8 +38,8 @@ interface ChartJsBarChartProps {
 export const ChartJsBarChart: React.FC<ChartJsBarChartProps> = ({ data, onBarClick }) => {
   const chartConfig = useChartConfig({ onBarClick });
 
-  // Sort data in ascending order by count (opposite of previous descending order)
-  const sortedData = [...data].sort((a, b) => a.count - b.count);
+  // Sort data by stage ID in descending order
+  const sortedData = [...data].sort((a, b) => b.id - a.id);
 
   const chartData = {
     labels: sortedData.map(item => item.name),
