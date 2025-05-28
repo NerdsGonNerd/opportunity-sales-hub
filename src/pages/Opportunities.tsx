@@ -102,7 +102,8 @@ const Opportunities = () => {
     
     switch (field) {
       case 'stage':
-        return mockStages.find(s => s.id === opportunity.stageId)?.name || '';
+        const stage = mockStages.find(s => s.id === opportunity.stageId);
+        return stage ? stage.id.toString() : ''; // Return ID as string for sorting
       case 'type':
         return mockTypes.find(t => t.id === opportunity.typeId)?.name || '';
       case 'probability':
@@ -150,11 +151,13 @@ const Opportunities = () => {
       };
     });
     
-    // Sort stages by ID in ascending order
-    const sortedStages = stageCounts.sort((a, b) => a.id - b.id);
+    // Filter out stages with zero opportunities and sort by ID
+    const filteredStages = stageCounts
+      .filter(stage => stage.count > 0)
+      .sort((a, b) => a.id - b.id);
     
-    console.log('Final stage data (sorted by ID):', sortedStages);
-    return sortedStages;
+    console.log('Final stage data (filtered and sorted by ID):', filteredStages);
+    return filteredStages;
   }, [baseFilteredOpportunities]);
 
   // Apply filters and sorting to base filtered opportunities
