@@ -1,4 +1,3 @@
-
 import { ChartOptions } from 'chart.js';
 
 interface UseChartConfigProps {
@@ -54,7 +53,7 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
             return context[0].label;
           },
           label: function(context) {
-            return `${context.label}: ${context.parsed.x}`;
+            return `Opportunities: ${context.parsed.x}`;
           }
         },
         backgroundColor: 'white',
@@ -66,7 +65,7 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
       },
       datalabels: {
         anchor: 'end',
-        align: 'center',
+        align: 'start',
         clamp: true,
         offset: -10,
         color: 'white',
