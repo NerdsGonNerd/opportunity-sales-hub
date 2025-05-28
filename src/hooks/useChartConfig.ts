@@ -84,6 +84,11 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
         }
       }
     },
+    onHover: (event, elements, chart) => {
+      if (chart.canvas) {
+        chart.canvas.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+      }
+    },
     onClick: (event, elements, chart) => {
       if (elements.length > 0 && onBarClick) {
         const elementIndex = elements[0].index;
