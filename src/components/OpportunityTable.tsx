@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { mockStages, mockTypes, mockProbabilities, mockSources } from '@/data/mockData';
 import { Opportunity } from '@/pages/Opportunities';
+import { MonthYearSelector } from './MonthYearSelector';
 
 interface OpportunityTableProps {
   opportunities: Opportunity[];
@@ -106,6 +106,38 @@ export const OpportunityTable: React.FC<OpportunityTableProps> = ({
           onCheckedChange={(checked) => 
             onUpdateOpportunity(opportunity.id, { isUrgent: !!checked })
           }
+        />
+      );
+    }
+
+    if (column === 'estimateClose') {
+      return (
+        <MonthYearSelector
+          month={opportunity.estimateCloseMonth}
+          year={opportunity.estimateCloseYear}
+          onMonthChange={(month) => 
+            onUpdateOpportunity(opportunity.id, { estimateCloseMonth: month })
+          }
+          onYearChange={(year) => 
+            onUpdateOpportunity(opportunity.id, { estimateCloseYear: year })
+          }
+          className="min-w-32"
+        />
+      );
+    }
+
+    if (column === 'estimateDelivery') {
+      return (
+        <MonthYearSelector
+          month={opportunity.estimateDeliveryMonth}
+          year={opportunity.estimateDeliveryYear}
+          onMonthChange={(month) => 
+            onUpdateOpportunity(opportunity.id, { estimateDeliveryMonth: month })
+          }
+          onYearChange={(year) => 
+            onUpdateOpportunity(opportunity.id, { estimateDeliveryYear: year })
+          }
+          className="min-w-32"
         />
       );
     }
