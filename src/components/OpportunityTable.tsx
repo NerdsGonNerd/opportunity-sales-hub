@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -89,7 +90,7 @@ export const OpportunityTable: React.FC<OpportunityTableProps> = ({
       case 'estimateClose':
         return `${opportunity.estimateCloseMonth}/${opportunity.estimateCloseYear}`;
       case 'estimateRevenue':
-        return opportunity.estimateRevenue ? `$${opportunity.estimateRevenue.toLocaleString()}` : '';
+        return opportunity.estimateRevenue ? `$${Math.round(opportunity.estimateRevenue).toLocaleString()}` : '';
       case 'isUrgent':
         return opportunity.isUrgent;
       default:
@@ -318,3 +319,4 @@ export const OpportunityTable: React.FC<OpportunityTableProps> = ({
     </div>
   );
 };
+
