@@ -65,7 +65,7 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
         displayColors: false
       },
       datalabels: {
-        anchor: 'center',
+        anchor: 'end',
         align: 'center',
         color: 'white',
         font: {
@@ -79,8 +79,12 @@ export const useChartConfig = ({ onBarClick, stageCount }: UseChartConfigProps) 
         display: function(context) {
           // Only show labels for bars with values > 0
           const value = context.dataset.data[context.dataIndex];
-          const count = typeof value === 'object' && value !== null && 'x' in value ? value.x : typeof value === 'number' ? value : 0;
-          return count > 0;
+          const numericValue = typeof value === 'object' && value !== null && 'x' in value 
+            ? (value as any).x 
+            : typeof value === 'number' 
+            ? value 
+            : 0;
+          return numericValue > 0;
         }
       }
     },
