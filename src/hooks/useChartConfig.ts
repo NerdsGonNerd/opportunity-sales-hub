@@ -71,7 +71,7 @@ export const useChartConfig = ({ onBarClick }: UseChartConfigProps): ChartOption
           size: 12
         },
         formatter: (value: any) => {
-          return value.x;
+          return value.x || value;
         }
       }
     },
