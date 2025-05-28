@@ -63,8 +63,8 @@ export const useChartConfig = ({ onBarClick }: UseChartConfigProps): ChartOption
         displayColors: false
       },
       datalabels: {
-        anchor: 'center',
-        align: 'center',
+        anchor: 'end',
+        align: 'end',
         color: 'white',
         font: {
           weight: 'bold',
