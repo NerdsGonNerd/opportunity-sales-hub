@@ -63,10 +63,10 @@ export const useChartConfig = ({ onBarClick }: UseChartConfigProps): ChartOption
         displayColors: false
       }
     },
-    onClick: (event, elements) => {
+    onClick: (event, elements, chart) => {
       if (elements.length > 0 && onBarClick) {
         const elementIndex = elements[0].index;
-        const stageId = (event.chart.data.datasets[0].data[elementIndex] as any)?.stageId;
+        const stageId = (chart.data.datasets[0].data[elementIndex] as any)?.stageId;
         if (stageId) {
           onBarClick(stageId);
         }
