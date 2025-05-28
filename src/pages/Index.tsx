@@ -1,12 +1,28 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">CRM Dashboard</CardTitle>
+          <p className="text-gray-600">Sales opportunity management system</p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button 
+            onClick={() => navigate('/opportunities')} 
+            className="w-full"
+            size="lg"
+          >
+            View Sales Opportunities
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
